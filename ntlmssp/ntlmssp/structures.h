@@ -6,55 +6,55 @@
 using namespace std;
 
 enum NegotiateFlags {
-	End
+    End
 };
 
 struct FileTime {
-	uint32_t LowDateTime = 0;
-	uint32_t HighDateTime = 0;
+    uint32_t LowDateTime = 0;
+    uint32_t HighDateTime = 0;
 };
 
 struct AvPairs {
 private:
-	uint16_t avid = 0;
-	uint16_t avlen = 0;
-	unique_ptr<vector<byte>> avbuff = nullptr;
+    uint16_t avid = 0;
+    uint16_t avlen = 0;
+    unique_ptr<vector<byte>> avbuff = nullptr;
 
-	void reset() noexcept;
-	void copy_buffer(shared_ptr<vector<byte>> buffer);
+    void reset() noexcept;
+    void copy_buffer(shared_ptr<vector<byte>> buffer);
 public:
-	enum AvId {
-		AccountAuthenticationIsConstrained = 0x1 << 1,
-		MicAvailable = 0x1 << 2,
-		UntrustedTargetSpn = 0x1 << 3,
-		End
-	};
+    enum AvId {
+        AccountAuthenticationIsConstrained = 0x1 << 1,
+        MicAvailable = 0x1 << 2,
+        UntrustedTargetSpn = 0x1 << 3,
+        End
+    };
 
-	enum AvFlags {
-		MsvAvlEOL = 0,
-		MsvAvNbComputerName = 1,
-		MsvAvNbDomainName = 2,
-		MsvAvDnsComputerName = 3,
-		MsvAvDnsDomainName = 4,
-		MsvAvDnsTreeName = 5,
-		MsvAvFlags = 6,
-		MsvAvTimestamp = 7,
-		MsvAvSingleHost = 8,
-		MsvAvTargetName = 9,
-		MsvChannelBindings = 10,
-		End
-	};
+    enum AvFlags {
+        MsvAvlEOL = 0,
+        MsvAvNbComputerName = 1,
+        MsvAvNbDomainName = 2,
+        MsvAvDnsComputerName = 3,
+        MsvAvDnsDomainName = 4,
+        MsvAvDnsTreeName = 5,
+        MsvAvFlags = 6,
+        MsvAvTimestamp = 7,
+        MsvAvSingleHost = 8,
+        MsvAvTargetName = 9,
+        MsvChannelBindings = 10,
+        End
+    };
 
-	AvPairs() = default;
-	AvPairs(shared_ptr<vector<byte>> buffer);
-	AvPairs(AvId id, shared_ptr<vector<byte>> buffer);
-	~AvPairs() = default;
+    AvPairs() = default;
+    AvPairs(shared_ptr<vector<byte>> buffer);
+    AvPairs(AvId id, shared_ptr<vector<byte>> buffer);
+    ~AvPairs() = default;
 
-	void set_id(AvId id) noexcept;
-	void set_buffer(shared_ptr<vector<byte>> buffer);
-	bool validate();
+    void set_id(AvId id) noexcept;
+    void set_buffer(shared_ptr<vector<byte>> buffer);
+    bool validate();
 
-	unique_ptr<vector<byte>> serialize();
+    unique_ptr<vector<byte>> serialize();
 };
 
 //Every AvPair has different data that can be added, broken into different groups:
@@ -68,20 +68,20 @@ public:
 
 struct AvPairsBuilder {
 private:
-	//A little optimazation: an MsvAvEOL pair is just a word-sized 0.
-	uint32_t MsvEolPair = 0;
-	unique_ptr<vector<AvPairs>> CurrentList = nullptr;
+    //A little optimazation: an MsvAvEOL pair is just a word-sized 0.
+    uint32_t MsvEolPair = 0;
+    unique_ptr<vector<AvPairs>> CurrentList = nullptr;
 public:
-	AvPairsBuilder();
-	~AvPairsBuilder();
+    AvPairsBuilder();
+    ~AvPairsBuilder();
 
-	void add_computer_name(wstring & const name, TargetNameType type);
-	void add_domain_name(wstring & const name, TargetNameType type);
-	void add_tree_dns_name(wstring& const name);
-	void add_target_name(wstring& const name);
-	void add_filetime(FileTime& const time);
-	bool validate();
+    void add_computer_name(helper::netstring & const name);
+    void add_domain_name(helper::netstring& const name);
+    void add_tree_name(helper::netstring& const name);
+    void add_target_name(helper::netstring& const name);
+    void add_filetime(FileTime& const time);
+    bool validate();
 
-	unique_ptr<vector<AvPairs>> get_list();
-	unique_ptr<vector<byte>> serialize();
+    unique_ptr<vector<AvPairs>> get_list();
+    unique_ptr<vector<byte>> serialize();
 };
