@@ -7,7 +7,7 @@
 
 typedef unsigned char byte;
 
-namespace helper {
+namespace util {
 
     enum SizeType {
         Byte,
@@ -20,7 +20,7 @@ namespace helper {
     // We could allow bits but then we have to figure out how to handle remainders.
     class size {
     private:
-        //internally we're storing the size as number of bytes.
+        // internally we're storing the size as number of bytes.
         size_t absolute = 0;
     public:
         size() = default;

@@ -13,36 +13,46 @@
 
 using namespace std;
 
-// #tosearch: we're assuming here that bytes are 8-bit in our architecture. Technically this
-// isn't guaranteed in all architectures, but is this still a concern?
-helper::size const Md5HashSize = helper::SizeInBytes(16); //128-bit hash size
+namespace crypto {
 
-class Md5 {
-private:
-    helper::size const Md5BlockSize = helper::SizeInWords32(16); //512-bit block size
-    vector<uint32_t> state;
-    vector<byte> hash;
-
-    //this should be in a table since this never changes, putting the function for lazyness
-    int SinTable(int i) { return int(4294967296 * abs(sin(i))); }
-
-    //Function definition
-    using auxfunc = std::function<uint32_t(uint32_t, uint32_t, uint32_t)>;
-
-    //Yes, we do want a to change.
-    void md5round(uint32_t & a, uint32_t const b, uint32_t const c, uint32_t const d, auxfunc func, uint32_t const currword, int const shift, int const TableValue) {
-        a = b + ((a + func(b, c, d) + currword + SinTable(TableValue)) << shift);
-    }
+    util::size const Md5HashSize = util::SizeInBytes(16); //128-bit hash size
     
-    void md5_transform(vector<uint32_t> & const block);
+    //the md5 hash of no data (e.g. the string "") is a known constant. 
+    vector<byte> const Md5HashEmptyData = { 
+        0xd4, 0x1d, 0x8c, 0xd9, 
+        0x8f, 0x00, 0xb2, 0x04,
+        0xe9, 0x80, 0x09, 0x98,
+        0xec, 0xf8, 0x42, 0x7e 
+    };
 
-    void init();
-    void padbuffer();
+    class Md5 {
+    private:
+        util::size const Md5BlockSize = util::SizeInWords32(16); //512-bit block size
+        vector<uint32_t> state;
 
-public:
-    Md5();
-    ~Md5() = default;
+        //this should be in a table since this never changes, putting the function for lazyness
+        int SinTable(int i) { return int(4294967296 * abs(sin(i))); }
 
-    unique_ptr<vector<byte>> calculate_hash(vector<byte> & const buffer);
-    unique_ptr<vector<byte>> calculate_hash(string& const s);
-};
+        //Function definition
+        using auxfunc = std::function<uint32_t(uint32_t, uint32_t, uint32_t)>;
+
+        //N.B. 'a' is changed by this function
+        void inline md5round(uint32_t& a, uint32_t const b, uint32_t const c, uint32_t const d, auxfunc func, uint32_t const currword, int const shift, int const TableValue);
+
+        void md5_transform(vector<uint32_t>& const block);
+
+        void init();
+        void padbuffer();
+
+    public:
+        Md5();
+        ~Md5() = default;
+
+        unique_ptr<vector<byte>> calculate_hash(vector<byte>& const buffer);
+        unique_ptr<vector<byte>> calculate_hash(string& const s);
+
+        // Md5 input buffer is arbitrary length, support a situation where vector's cannot 
+        // store the size of this lad.
+        unique_ptr<vector<byte>> calculate_hash(unique_ptr<byte> buffer, uint64_t bitsize);
+    };
+}

@@ -75,10 +75,10 @@ public:
     AvPairsBuilder();
     ~AvPairsBuilder();
 
-    void add_computer_name(helper::netstring & const name);
-    void add_domain_name(helper::netstring& const name);
-    void add_tree_name(helper::netstring& const name);
-    void add_target_name(helper::netstring& const name);
+    void add_computer_name(util::netstring & const name);
+    void add_domain_name(util::netstring& const name);
+    void add_tree_name(util::netstring& const name);
+    void add_target_name(util::netstring& const name);
     void add_filetime(FileTime& const time);
     bool validate();
 
