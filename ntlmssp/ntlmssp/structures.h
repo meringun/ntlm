@@ -5,10 +5,6 @@
 
 using namespace std;
 
-enum NegotiateFlags {
-    End
-};
-
 struct FileTime {
     uint32_t LowDateTime = 0;
     uint32_t HighDateTime = 0;

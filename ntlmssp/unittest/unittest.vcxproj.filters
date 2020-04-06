@@ -26,5 +26,8 @@
     <ClInclude Include="cryptotests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="testbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

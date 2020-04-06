@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cryptotests.h" />
+    <ClInclude Include="testbase.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ntlmssp\ntlmssp.vcxproj">
