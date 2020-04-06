@@ -49,10 +49,5 @@ namespace crypto {
         ~Md5() = default;
 
         unique_ptr<vector<byte>> calculate_hash(vector<byte>& const buffer);
-        unique_ptr<vector<byte>> calculate_hash(string& const s);
-
-        // Md5 input buffer is arbitrary length, support a situation where vector's cannot 
-        // store the size of this lad.
-        unique_ptr<vector<byte>> calculate_hash(unique_ptr<byte> buffer, uint64_t bitsize);
     };
 }

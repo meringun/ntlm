@@ -1,14 +1,17 @@
 #pragma once
-
 #include "testbase.h"
-
+#include "md5.h"
 
 namespace unittest {
-	struct Md5Test : public test {
-	protected:
+	struct Md5Test : test {
+	private:
+		std::vector<byte> testinput, testoutput;
+		std::string instring, outstring;
 	public:
-		Md5Test() : testname("Md5") {
-
-		};
+		Md5Test() : test("md5") {}
+		Md5Test(std::vector<byte> const& input, std::vector<byte> const& output);
+		Md5Test(std::string const& input, std::string const& byteoutput);
+		
+		bool run();
 	};
 }

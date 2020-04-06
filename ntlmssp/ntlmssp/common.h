@@ -9,6 +9,16 @@ typedef unsigned char byte;
 
 namespace util {
 
+    static byte hextobyte(char const c) {
+        if (c >= 0 && c <= 9)
+            return (c - '0');
+        if (c >= 'a' && c <= 'f')
+            return (c - 'a' + 0xa);
+        if (c >= 'A' && c <= 'F')
+            return (c - 'A' + 0xa);
+        return 0;
+    }
+
     enum class sizeunit {
         byte,
         word32,
@@ -45,13 +55,13 @@ namespace util {
         size_t getwords64() const { return absolute / sizeof(uint64_t); }
     };
 
-    size SizeInBytes(size_t s) { 
+    static size SizeInBytes(size_t s) { 
         return size(s, sizeunit::byte); 
     }
-    size SizeInWords32(size_t s) {
+    static size SizeInWords32(size_t s) {
         return size(s, sizeunit::word32);
     }
-    size SizeInWords64(size_t s) {
+    static size SizeInWords64(size_t s) {
         return size(s, sizeunit::word64);
     }
     

@@ -85,8 +85,6 @@ namespace crypto {
         }
 
         vector<uint32_t> block(Md5BlockSize.getwords32(),0);
-        
-                    
 
         // Now append the length of the buffer originally, with length meaning number of bits. 
         // currently this doesn't handle the condition of the message itself being 2^61 bytes or 
@@ -95,19 +93,6 @@ namespace crypto {
         block.push_back(BufferSize & 0xFFFFFFFF);
         block.push_back((BufferSize >> 32) & 0xFFFFFFFF);
 
-    }
-
-    unique_ptr<vector<byte>> Md5::calculate_hash(string& const s) {
-        if (s.empty()) {
-            return make_unique<vector<byte>>(Md5HashEmptyData);
-        }
-        
-    }
-
-    unique_ptr<vector<byte>> Md5::calculate_hash(unique_ptr<byte> const buffer, uint64_t const bitsize) {
-        if (buffer == nullptr || bitsize == 0) {
-            return make_unique<vector<byte>>(Md5HashEmptyData);
-        }
     }
 }
 
