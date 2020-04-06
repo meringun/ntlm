@@ -4,6 +4,9 @@
 
 /ntlmssp/ntlmssp/Debug
 /ntlmssp/Debug
-/ntlmssp/.vs/ntlmssp/v16
 /.vs
 /ntlmssp/unittest/Debug
+/ntlmssp/x64/Debug
+/ntlmssp/ntlmssp/x64/Debug
+/ntlmssp/unittest/x64/Debug
+/ntlmssp/.vs/ntlmssp/v16
