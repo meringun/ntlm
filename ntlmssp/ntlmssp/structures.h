@@ -46,7 +46,7 @@ public:
     AvPairs(AvId id, shared_ptr<vector<byte>> buffer);
     ~AvPairs() = default;
 
-    void set_id(AvId id) noexcept;
+    void set_id(AvId id);
     void set_buffer(shared_ptr<vector<byte>> buffer);
     bool validate();
 
@@ -71,7 +71,7 @@ public:
     AvPairsBuilder();
     ~AvPairsBuilder();
 
-    void add_computer_name(util::netstring & const name);
+    void add_computer_name(util::netstring& const name);
     void add_domain_name(util::netstring& const name);
     void add_tree_name(util::netstring& const name);
     void add_target_name(util::netstring& const name);

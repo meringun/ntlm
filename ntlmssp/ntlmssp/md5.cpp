@@ -14,12 +14,17 @@ namespace crypto {
     Md5::Md5() {
         init();
     }
-
-    void inline Md5::md5round(uint32_t& a, uint32_t const b, uint32_t const c, uint32_t const d, auxfunc func, uint32_t const currword, int const shift, int const TableValue) {
-        a = b + ((a + func(b, c, d) + currword + SinTable(TableValue)) << shift);
+    // e.g.1100110 << 3 == 0110110
+    // Handling the case where shift is 0 without using an if()
+    uint32_t inline Md5::circular_lshift(uint32_t const x, int const shift) {
+        return (x << shift) | (x >> (-shift & 31));
     }
 
-    void Md5::md5_transform(vector<uint32_t>& const block) {
+    void inline Md5::md5round(uint32_t& a, uint32_t const b, uint32_t const c, uint32_t const d, auxfunc func, uint32_t const currword, int const shift, int const TableValue) {
+        a = b + circular_lshift(a + func(b, c, d) + currword + SinTable(TableValue), shift);
+    }
+
+    void Md5::md5_transform(vector<uint32_t> const & block) {
         //round and round we go
         uint32_t a = state[0], b = state[1], c = state[2], d = state[3];
         int TableInput = 1;
@@ -52,8 +57,8 @@ namespace crypto {
 
         //Round 3
         Md5Cycle c3;
-        c3.CycleFunction = [](uint32_t const x, uint32_t const y, uint32_t const z) { return (x ^ y & z); };
-        c3.BlockPosition = { 5, 6, 11, 14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2 };
+        c3.CycleFunction = [](uint32_t const x, uint32_t const y, uint32_t const z) { return (x ^ y ^ z); };
+        c3.BlockPosition = { 5, 8, 11, 14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2 };
         c3.BitShift = { 4, 11, 16, 23 };
         cycles.push_back(c3);
 
@@ -79,20 +84,75 @@ namespace crypto {
         state[3] += d;
     }
 
-    unique_ptr<vector<byte>> Md5::calculate_hash(vector<byte>& const buffer) {
+    uint32_t inline Md5::packbytes(byte const lsb, byte const mlb, byte const mhb, byte const msb) {
+        return (msb << 24 | mhb << 16 | mlb << 8 | lsb);
+    }
+    uint32_t inline Md5::packbytes(vector<byte> const& bytes) {
+        return (packbytes(bytes[0], bytes[1], bytes[2], bytes[3]));
+    }
+    void Md5::expandbytes(uint32_t const& word, vector<byte>& buffer) {
+            buffer.push_back(word & 0x000000FF);
+            buffer.push_back((word & 0x0000FF00) >> 8);
+            buffer.push_back((word & 0x00FF0000) >> 16);
+            buffer.push_back((word & 0xFF000000) >> 24);
+    }
+
+    void Md5::expandbytes(vector<uint32_t> const& wordbuffer, unique_ptr<vector<byte>>& bytebuff) {
+        for (uint32_t const& word : wordbuffer) {
+            expandbytes(word, *bytebuff);
+        }
+    }
+
+    void Md5::pagebuffer(vector<byte>::const_iterator & iterator, vector<uint32_t>& block) {
+        for (int j = 0; j < Md5BlockSize.getwords32(); j++) {
+            auto citr = iterator + j * 4;
+            block[j] = packbytes(*citr, *(citr + 1), *(citr + 2), *(citr + 3));
+        }
+    }
+
+
+    unique_ptr<vector<byte>> Md5::calculate_hash(vector<byte> const & buffer) {
         if (buffer.empty()) {
             return make_unique<vector<byte>>(Md5HashEmptyData);
         }
-
+        
         vector<uint32_t> block(Md5BlockSize.getwords32(),0);
+        
+        // We only have to worry about padding on the last block of the buffer, before that we 
+        // can just copy it and process.
+        auto blockstart = buffer.begin();
+        for (; buffer.end() - blockstart > Md5BlockSize.getbytes(); blockstart += Md5BlockSize.getbytes()) {
+            pagebuffer(blockstart, block);
+            md5_transform(block);
+        }
+        
+        // We're now at the last block. To make our lives easier we'll use a temporary byte block 
+        vector<byte> tempbuffer(blockstart, buffer.end());
 
-        // Now append the length of the buffer originally, with length meaning number of bits. 
-        // currently this doesn't handle the condition of the message itself being 2^61 bytes or 
-        // 2.3 exabytes, but that's fine.
-        uint64_t BufferSize = buffer.size() * 8;
-        block.push_back(BufferSize & 0xFFFFFFFF);
-        block.push_back((BufferSize >> 32) & 0xFFFFFFFF);
+        int last_pos = (buffer.size() % Md5BlockSize.getbytes());
+        int padlength = last_pos < md5mod ? md5mod - last_pos : Md5BlockSize.getbytes() - (last_pos - md5mod);
 
+        tempbuffer.push_back(0x80); padlength--;
+        for (int i = 0; i < padlength; i++)
+            tempbuffer.push_back(0);
+
+        // Now append the length of the buffer, with length meaning number of bits. 
+        // Since we're using a vector, max bit size is 2^32*8 or 2^35. Digest supports arbitrary
+        // length but this is good enough for us. 
+        uint64_t BufferSize = (uint64_t)buffer.size() * 8;
+        expandbytes((BufferSize & 0xFFFFFFFF), tempbuffer);
+        expandbytes((BufferSize >> 32) & 0xFFFFFFFF, tempbuffer);
+        
+        for(auto citr = tempbuffer.begin(); citr < tempbuffer.end(); citr += Md5BlockSize.getbytes()) {
+            pagebuffer(citr, block);
+            md5_transform(block);
+        }
+        unique_ptr<vector<byte>> hash = make_unique<vector<byte>>();
+        expandbytes(state, hash);
+        init(); //refresh the starting state.
+        std::fill(tempbuffer.begin(), tempbuffer.end(), 0);
+        std::fill(block.begin(), block.end(), 0);
+        return hash;
     }
 }
 

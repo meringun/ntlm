@@ -16,6 +16,7 @@ using namespace std;
 namespace crypto {
 
     util::size const Md5HashSize = util::SizeInBytes(16); //128-bit hash size
+    int const md5mod = 56;
     
     //the md5 hash of no data (e.g. the string "") is a known constant. 
     vector<byte> const Md5HashEmptyData = { 
@@ -31,23 +32,29 @@ namespace crypto {
         vector<uint32_t> state;
 
         //this should be in a table since this never changes, putting the function for lazyness
-        int SinTable(int i) { return int(4294967296 * abs(sin(i))); }
+        uint32_t SinTable(int i) {
+            return 4294967296 * abs(sin(i));
+        }
 
         //Function definition
         using auxfunc = std::function<uint32_t(uint32_t, uint32_t, uint32_t)>;
 
         //N.B. 'a' is changed by this function
+        uint32_t inline circular_lshift(uint32_t const x, int const shift);
         void inline md5round(uint32_t& a, uint32_t const b, uint32_t const c, uint32_t const d, auxfunc func, uint32_t const currword, int const shift, int const TableValue);
-
-        void md5_transform(vector<uint32_t>& const block);
+        void md5_transform(vector<uint32_t> const & block);
 
         void init();
-        void padbuffer();
+        uint32_t inline packbytes(byte const msb, byte const mhb, byte const mlb, byte const lsb);
+        uint32_t inline packbytes(vector<byte> const& bytes);
+        void expandbytes(vector<uint32_t> const& wordbuffer, unique_ptr<vector<byte>> & bytebuff);
+        void expandbytes(uint32_t const& word, vector<byte>& buffer);
+        void pagebuffer(vector<byte>::const_iterator & iterator, vector<uint32_t>& block);
 
     public:
         Md5();
         ~Md5() = default;
 
-        unique_ptr<vector<byte>> calculate_hash(vector<byte>& const buffer);
+        unique_ptr<vector<byte>> calculate_hash(vector<byte> const & buffer);
     };
 }

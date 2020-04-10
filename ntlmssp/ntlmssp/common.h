@@ -4,18 +4,19 @@
 #include <vector>
 #include <cstdint>
 #include <string>
+#include <stdexcept>
 
 typedef unsigned char byte;
 
 namespace util {
 
-    static byte hextobyte(char const c) {
-        if (c >= 0 && c <= 9)
+    static byte hextobyte(char const & c) {
+        if (c >= '0' && c <= '9')
             return (c - '0');
         if (c >= 'a' && c <= 'f')
-            return (c - 'a' + 0xa);
+            return ((c - 'a') + 0xa);
         if (c >= 'A' && c <= 'F')
-            return (c - 'A' + 0xa);
+            return ((c - 'A') + 0xa);
         return 0;
     }
 
@@ -68,22 +69,22 @@ namespace util {
     // when dealing with network names, we don't know whether they're 
     // a netbios mame or fqdn or spn.
 
-    enum NameType {
-        Netbios,
-        Dns,
-        Spn
+    enum class nametype {
+        netbios,
+        dns,
+        spn
     };
 
     class netstring {
     private:
         std::wstring str = L"";
-        NameType type = Netbios;
+        nametype type = nametype::netbios;
     public:
         netstring() = default;
+        netstring(std::wstring& name, nametype type);
         ~netstring() = default;
 
-        std::vector<byte> getbuffer() const {
-            
-        }
+        std::vector<byte> getbuffer(bool IncludeNull) const;
+
     };
 }

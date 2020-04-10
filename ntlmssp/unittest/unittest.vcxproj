@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\andre\Source\Repos\meringun\ntlm\ntlmssp\ntlmssp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;..\ntlmssp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,10 +151,12 @@
   <ItemGroup>
     <ClCompile Include="..\ntlmssp\cryptotests.cpp" />
     <ClCompile Include="unittest.cpp" />
+    <ClCompile Include="utiltests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cryptotests.h" />
     <ClInclude Include="testbase.h" />
+    <ClInclude Include="utiltests.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ntlmssp\ntlmssp.vcxproj">
