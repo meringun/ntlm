@@ -21,29 +21,29 @@ namespace crypto {
     }
 
     void inline Md5::md5round(uint32_t& a, uint32_t const b, uint32_t const c, uint32_t const d, auxfunc func, uint32_t const currword, int const shift, int const TableValue) {
-        a = b + circular_lshift(a + func(b, c, d) + currword + SinTable(TableValue), shift);
+        a = b + circular_lshift(a + func(b, c, d) + currword + K[TableValue], shift);
     }
 
-    void Md5::md5_transform(vector<uint32_t> const & block) {
+    void Md5::md5_transform(std::vector<uint32_t> const& block) {
         //round and round we go
         uint32_t a = state[0], b = state[1], c = state[2], d = state[3];
-        int TableInput = 1;
+        int TableInput = 0;
 
-        // There's a lot of repitition in these calculations: Each round is grouped in 4 batches of 4 for how
+        // There's a lot of repetition in these calculations: Each round is grouped in 4 batches of 4 for how
         // a,b,c,d and the shifter values cycle, with 4 rounds in total. The only thing that's different between
         // the batches is the way we access the words in our block.
         // Note that TableInput goes from 1 .. 64 sequentially
 
         struct Md5Cycle {
-            vector<uint32_t> BlockPosition;
-            vector<int> BitShift;
+            std::vector<uint32_t> BlockPosition;
+            std::vector<int> BitShift;
             auxfunc CycleFunction;
         };
-        vector<Md5Cycle> cycles;
+        std::vector<Md5Cycle> cycles;
 
         //Round1
         Md5Cycle c1;
-        c1.CycleFunction = [](uint32_t const x, uint32_t const y, uint32_t const z) {return (x & y) | (~x & z); };
+        c1.CycleFunction = [](uint32_t const x, uint32_t const y, uint32_t const z) { return (x & y) | (~x & z); };
         c1.BlockPosition = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
         c1.BitShift = { 7, 12, 17, 22 };
         cycles.push_back(c1);
@@ -87,23 +87,23 @@ namespace crypto {
     uint32_t inline Md5::packbytes(byte const lsb, byte const mlb, byte const mhb, byte const msb) {
         return (msb << 24 | mhb << 16 | mlb << 8 | lsb);
     }
-    uint32_t inline Md5::packbytes(vector<byte> const& bytes) {
+    uint32_t inline Md5::packbytes(std::vector<byte> const& bytes) {
         return (packbytes(bytes[0], bytes[1], bytes[2], bytes[3]));
     }
-    void Md5::expandbytes(uint32_t const& word, vector<byte>& buffer) {
-            buffer.push_back(word & 0x000000FF);
-            buffer.push_back((word & 0x0000FF00) >> 8);
-            buffer.push_back((word & 0x00FF0000) >> 16);
-            buffer.push_back((word & 0xFF000000) >> 24);
+    void Md5::expandbytes(uint32_t const& word, std::vector<byte>& buffer) {
+        buffer.push_back(word & 0x000000FF);
+        buffer.push_back((word & 0x0000FF00) >> 8);
+        buffer.push_back((word & 0x00FF0000) >> 16);
+        buffer.push_back((word & 0xFF000000) >> 24);
     }
 
-    void Md5::expandbytes(vector<uint32_t> const& wordbuffer, unique_ptr<vector<byte>>& bytebuff) {
+    void Md5::expandbytes(std::vector<uint32_t> const& wordbuffer, std::unique_ptr<std::vector<byte>>& bytebuff) {
         for (uint32_t const& word : wordbuffer) {
             expandbytes(word, *bytebuff);
         }
     }
 
-    void Md5::pagebuffer(vector<byte>::const_iterator & iterator, vector<uint32_t>& block) {
+    void Md5::pagebuffer(std::vector<byte>::const_iterator& iterator, std::vector<uint32_t>& block) {
         for (int j = 0; j < Md5BlockSize.getwords32(); j++) {
             auto citr = iterator + j * 4;
             block[j] = packbytes(*citr, *(citr + 1), *(citr + 2), *(citr + 3));
@@ -111,13 +111,13 @@ namespace crypto {
     }
 
 
-    unique_ptr<vector<byte>> Md5::calculate_hash(vector<byte> const & buffer) {
+    std::unique_ptr<std::vector<byte>> Md5::calculate_hash(std::vector<byte> const& buffer) {
         if (buffer.empty()) {
-            return make_unique<vector<byte>>(Md5HashEmptyData);
+            return std::make_unique<std::vector<byte>>(Md5HashEmptyData);
         }
-        
-        vector<uint32_t> block(Md5BlockSize.getwords32(),0);
-        
+
+        std::vector<uint32_t> block(Md5BlockSize.getwords32(), 0);
+
         // We only have to worry about padding on the last block of the buffer, before that we 
         // can just copy it and process.
         auto blockstart = buffer.begin();
@@ -125,9 +125,9 @@ namespace crypto {
             pagebuffer(blockstart, block);
             md5_transform(block);
         }
-        
+
         // We're now at the last block. To make our lives easier we'll use a temporary byte block 
-        vector<byte> tempbuffer(blockstart, buffer.end());
+        std::vector<byte> tempbuffer(blockstart, buffer.end());
 
         int last_pos = (buffer.size() % Md5BlockSize.getbytes());
         int padlength = last_pos < md5mod ? md5mod - last_pos : Md5BlockSize.getbytes() - (last_pos - md5mod);
@@ -139,15 +139,15 @@ namespace crypto {
         // Now append the length of the buffer, with length meaning number of bits. 
         // Since we're using a vector, max bit size is 2^32*8 or 2^35. Digest supports arbitrary
         // length but this is good enough for us. 
-        uint64_t BufferSize = (uint64_t)buffer.size() * 8;
+        uint64_t BufferSize = (uint64_t) buffer.size() * 8;
         expandbytes((BufferSize & 0xFFFFFFFF), tempbuffer);
         expandbytes((BufferSize >> 32) & 0xFFFFFFFF, tempbuffer);
-        
-        for(auto citr = tempbuffer.begin(); citr < tempbuffer.end(); citr += Md5BlockSize.getbytes()) {
+
+        for (auto citr = tempbuffer.begin(); citr < tempbuffer.end(); citr += Md5BlockSize.getbytes()) {
             pagebuffer(citr, block);
             md5_transform(block);
         }
-        unique_ptr<vector<byte>> hash = make_unique<vector<byte>>();
+        std::unique_ptr<std::vector<byte>> hash = std::make_unique<std::vector<byte>>();
         expandbytes(state, hash);
 
         init(); //refresh the starting state.

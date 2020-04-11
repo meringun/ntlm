@@ -10,7 +10,7 @@ typedef unsigned char byte;
 
 namespace util {
 
-    static byte hextobyte(char const & c) {
+    static byte hextobyte(char const& c) {
         if (c >= '0' && c <= '9')
             return (c - '0');
         if (c >= 'a' && c <= 'f')
@@ -30,9 +30,6 @@ namespace util {
     // e.g. being able to say how big a buffer is in bytes or words. etc.
     // We could allow bits but then we have to figure out how to handle remainders.
     class size {
-    private:
-        // internally we're storing the size as number of bytes.
-        size_t absolute = 0;
     public:
         size() = default;
         size(size_t const size, sizeunit const unit) {
@@ -54,10 +51,13 @@ namespace util {
         size_t getbytes() const { return absolute; }
         size_t getwords32() const { return absolute / sizeof(uint32_t); }
         size_t getwords64() const { return absolute / sizeof(uint64_t); }
+    private:
+        // internally we're storing the size as number of bytes.
+        size_t absolute = 0;
     };
 
-    static size SizeInBytes(size_t s) { 
-        return size(s, sizeunit::byte); 
+    static size SizeInBytes(size_t s) {
+        return size(s, sizeunit::byte);
     }
     static size SizeInWords32(size_t s) {
         return size(s, sizeunit::word32);

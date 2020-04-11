@@ -5,10 +5,6 @@
 
 namespace unittest {
     struct test {
-    protected:
-        std::string const testname;
-        std::string errstring;
-        test(std::string const name) : testname(name) {}
     public:
         test() = default;
         void printerr() const {
@@ -18,12 +14,13 @@ namespace unittest {
             return errstring;
         }
         virtual bool run() = 0;
+    protected:
+        std::string const testname;
+        std::string errstring;
+        test(std::string const name) : testname(name) {};
     };
 
     struct testsuit {
-    private:
-        std::string suit_name = "";
-        std::vector<std::unique_ptr<test>> testarr;
     public:
         testsuit() = default;
         testsuit(std::string const& name) : suit_name(name) {};
@@ -41,9 +38,11 @@ namespace unittest {
                 else
                     t->printerr();
             }
-            std::cout << "testsuit \""<< suit_name << "\" result: " << passed << "/" << testarr.size() << " passed\n";
+            std::cout << "testsuit \"" << suit_name << "\" result: " << passed << "/" << testarr.size() << " passed\n";
             return passed == testarr.size();
         }
-
+    private:
+        std::string suit_name;
+        std::vector<std::unique_ptr<test>> testarr;
     };
 }
