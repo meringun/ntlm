@@ -26,9 +26,6 @@
     <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="structures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>

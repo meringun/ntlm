@@ -33,7 +33,7 @@ namespace crypto {
 
         //this should be in a table since this never changes, putting the function for lazyness
         uint32_t SinTable(int i) {
-            return 4294967296 * abs(sin(i));
+            return uint32_t(4294967296 * abs(sin(i)));
         }
 
         //Function definition

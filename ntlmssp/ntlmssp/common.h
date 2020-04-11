@@ -65,25 +65,4 @@ namespace util {
     static size SizeInWords64(size_t s) {
         return size(s, sizeunit::word64);
     }
-    
-    // when dealing with network names, we don't know whether they're 
-    // a netbios mame or fqdn or spn.
-
-    enum class nametype {
-        netbios,
-        dns,
-        spn
-    };
-    // #todo: add overloards to treat this class like a string.
-    class netstring {
-    private:
-        std::wstring str = L"";
-        nametype type = nametype::netbios;
-    public:
-        netstring() = default;
-        netstring(std::wstring& name, nametype type);
-        ~netstring() = default;
-
-        std::unique_ptr<std::vector<byte>> getbuffer(bool IncludeNull) const;
-    };
 }
