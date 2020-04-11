@@ -3,7 +3,7 @@
 #include "common.h"
 #include <string>
 
-using namespace std;
+// #todo: this header and its definition are incomplete. 
 
 struct FileTime {
     uint32_t LowDateTime = 0;
@@ -14,10 +14,9 @@ struct AvPairs {
 private:
     uint16_t avid = 0;
     uint16_t avlen = 0;
-    unique_ptr<vector<byte>> avbuff = nullptr;
+    std::vector<byte> avbuff;
 
-    void reset() noexcept;
-    void copy_buffer(shared_ptr<vector<byte>> buffer);
+    void reset();
 public:
     enum AvId {
         AccountAuthenticationIsConstrained = 0x1 << 1,
@@ -42,15 +41,13 @@ public:
     };
 
     AvPairs() = default;
-    AvPairs(shared_ptr<vector<byte>> buffer);
-    AvPairs(AvId id, shared_ptr<vector<byte>> buffer);
     ~AvPairs() = default;
 
     void set_id(AvId id);
-    void set_buffer(shared_ptr<vector<byte>> buffer);
+    void set_buffer(std::vector<byte> buffer);
     bool validate();
 
-    unique_ptr<vector<byte>> serialize();
+    std::unique_ptr<std::vector<byte>> serialize();
 };
 
 //Every AvPair has different data that can be added, broken into different groups:
@@ -60,13 +57,13 @@ public:
 // 4. FILETIME structure
 // 5. Single host Data structure.
 // there are also some AvPairs that MUST be included. 
-// Let's make our lives easier to have a builder with some more knowledge on the data.
 
+// #todo: implement this object.
 struct AvPairsBuilder {
 private:
     //A little optimazation: an MsvAvEOL pair is just a word-sized 0.
     uint32_t MsvEolPair = 0;
-    unique_ptr<vector<AvPairs>> CurrentList = nullptr;
+    std::vector<AvPairs> CurrentList;
 public:
     AvPairsBuilder();
     ~AvPairsBuilder();
@@ -78,6 +75,6 @@ public:
     void add_filetime(FileTime& const time);
     bool validate();
 
-    unique_ptr<vector<AvPairs>> get_list();
-    unique_ptr<vector<byte>> serialize();
+    std::unique_ptr<std::vector<AvPairs>> get_list();
+    std::unique_ptr<std::vector<byte>> serialize();
 };

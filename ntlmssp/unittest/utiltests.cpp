@@ -27,7 +27,7 @@ namespace unittest {
 	}
 
 	bool test_conversions() {
-		testsuit tests;
+		testsuit tests("Hex to Byte Conversion");
 
 		std::vector<byte> ints = { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9 };
 		std::vector<byte> ints2 = { 0xa, 0xb, 0xc, 0xd, 0xe, 0xf };
@@ -37,19 +37,10 @@ namespace unittest {
 		std::vector<char> chars3 = { 'A','B','C','D','E','F'};
 
 		
-		tests.push_back(std::make_unique<ConversionTests>(ints, chars1));
-		tests.push_back(std::make_unique<ConversionTests>(ints2, chars2));
-		tests.push_back(std::make_unique<ConversionTests>(ints2, chars3));
+		tests.addtest(std::make_unique<ConversionTests>(ints, chars1));
+		tests.addtest(std::make_unique<ConversionTests>(ints2, chars2));
+		tests.addtest(std::make_unique<ConversionTests>(ints2, chars3));
 		
-		int passed = 0;
-		std::cout << "starting conversion tests\n";
-		for (auto const& t : tests) {
-			if (t->run())
-				passed++;
-			else 
-				t->printerr();
-		}
-		std::cout << "conversion tests result: " << passed << "/" << tests.size() << " tests passed\n";
-		return passed == tests.size();
+		return tests.run();
 	}
 }

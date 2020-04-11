@@ -149,9 +149,11 @@ namespace crypto {
         }
         unique_ptr<vector<byte>> hash = make_unique<vector<byte>>();
         expandbytes(state, hash);
+
         init(); //refresh the starting state.
         std::fill(tempbuffer.begin(), tempbuffer.end(), 0);
         std::fill(block.begin(), block.end(), 0);
+
         return hash;
     }
 }

@@ -18,10 +18,10 @@
     <ClCompile Include="unittest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\ntlmssp\cryptotests.cpp">
+    <ClCompile Include="utiltests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utiltests.cpp">
+    <ClCompile Include="cryptotests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

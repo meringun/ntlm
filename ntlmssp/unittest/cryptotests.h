@@ -9,7 +9,6 @@ namespace unittest {
 		std::string instring, outstring;
 	public:
 		Md5Test() : test("md5") {}
-		Md5Test(std::vector<byte> const& input, std::vector<byte> const& output);
 		Md5Test(std::string const& input, std::string const& byteoutput);
 		bool run();
 	};

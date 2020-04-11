@@ -74,7 +74,7 @@ namespace util {
         dns,
         spn
     };
-
+    // #todo: add overloards to treat this class like a string.
     class netstring {
     private:
         std::wstring str = L"";
@@ -84,7 +84,6 @@ namespace util {
         netstring(std::wstring& name, nametype type);
         ~netstring() = default;
 
-        std::vector<byte> getbuffer(bool IncludeNull) const;
-
+        std::unique_ptr<std::vector<byte>> getbuffer(bool IncludeNull) const;
     };
 }

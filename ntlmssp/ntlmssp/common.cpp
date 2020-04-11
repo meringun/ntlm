@@ -1,7 +1,5 @@
-
 #include "common.h"
 #include "constants.h"
-#
 
 namespace util {
 	netstring::netstring(std::wstring& str, nametype type) {

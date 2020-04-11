@@ -149,7 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\ntlmssp\cryptotests.cpp" />
+    <ClCompile Include="cryptotests.cpp" />
     <ClCompile Include="unittest.cpp" />
     <ClCompile Include="utiltests.cpp" />
   </ItemGroup>
