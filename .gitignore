@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ntlmssp/ntlmssp/Debug
+/ntlmssp/Debug
+/.vs
+/ntlmssp/unittest/Debug
+/ntlmssp/x64/Debug
+/ntlmssp/ntlmssp/x64/Debug
+/ntlmssp/unittest/x64/Debug
+/ntlmssp/.vs/ntlmssp/v16
