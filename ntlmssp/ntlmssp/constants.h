@@ -1,8 +1,8 @@
 #pragma once
+#
 
 namespace constants {
-    //string constants, does not include null char.
-    const int max_netbios = 16;
-    const int max_dns = 253;
-    const int max_spn = 256;
+    const int netbios_maxlen = 16;
+    const int dns_maxlen = 253;
+    const int spn_maxlen = 256;
 }

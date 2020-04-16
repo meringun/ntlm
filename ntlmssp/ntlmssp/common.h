@@ -20,6 +20,26 @@ namespace util {
         return 0;
     }
 
+    static inline byte getlsb(uint16_t const data) {
+        return data & 0x00FF;
+    }
+    static inline byte getmsb(uint16_t const data) {
+        return (data & 0xFF00) >> 8;
+    }
+
+    static inline byte getlsb(uint32_t const data) {
+        return data & 0x000000FF;
+    }
+    static inline byte getlob(uint32_t const data) {
+        return (data & 0x0000FF00) >> 8;
+    }
+    static inline byte gethob(uint32_t const data) {
+        return (data & 0x00FF0000) >> 16;
+    }
+    static inline byte getmsb(uint32_t const data) {
+        return (data & 0xFF000000) >> 24;
+    }
+
     enum class sizeunit {
         byte,
         word32,

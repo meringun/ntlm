@@ -91,10 +91,10 @@ namespace crypto {
         return (packbytes(bytes[0], bytes[1], bytes[2], bytes[3]));
     }
     void Md5::expandbytes(uint32_t const& word, std::vector<byte>& buffer) {
-        buffer.push_back(word & 0x000000FF);
-        buffer.push_back((word & 0x0000FF00) >> 8);
-        buffer.push_back((word & 0x00FF0000) >> 16);
-        buffer.push_back((word & 0xFF000000) >> 24);
+        buffer.push_back(util::getlsb(word));
+        buffer.push_back(util::getlob(word));
+        buffer.push_back(util::gethob(word));
+        buffer.push_back(util::getmsb(word));
     }
 
     void Md5::expandbytes(std::vector<uint32_t> const& wordbuffer, std::unique_ptr<std::vector<byte>>& bytebuff) {
